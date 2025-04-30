@@ -47,6 +47,10 @@ const GamePage = () => {
   const [currentRound, setCurrentRound] = useState(0); // Aktuelle Runde
   const [playerPlayedCards, setPlayerPlayedCards] = useState([]); // Karten, die der Spieler gelegt hat
   const [aiPlayedCards, setAiPlayedCards] = useState([]); // Karten, die die AI gelegt hat
+  const [roundEvaluated, setRoundEvaluated] = useState(false);
+  const [playerScore, setPlayerScore] = useState(0);
+  const [aiScore, setAiScore] = useState(0);
+  const [playerHandStrength, setPlayerHandStrength] = useState(""); // Zum Speichern der Handbewertung
 
   // Funktion zum Ziehen von 7 Karten für den Spieler
   const drawPlayerCards = () => {
@@ -79,9 +83,17 @@ const GamePage = () => {
     if (playerPlayedCards.length >= 5) {
       return;
     }
+
+    // Neue Hand des Spielers nach der gespielten Karte
     const newPlayerHand = playerHand.filter((c) => c !== card);
     setPlayerHand(newPlayerHand);
+
+    // Füge die Karte zur Liste der gespielten Karten hinzu
     setPlayerPlayedCards([...playerPlayedCards, card]);
+
+    // Bewerte die Hand des Spielers, wenn die Karten gespielt werden
+    const handStrength = evaluateHand([...playerPlayedCards, card]); // Spielerhand + die neue Karte
+    setPlayerHandStrength(handStrength); // Setze die Handbewertung
   };
 
   // Funktion zum Karten spielen (AI)
@@ -114,13 +126,16 @@ const GamePage = () => {
       const aiCardValue = values.indexOf(aiCards[0]?.value);
 
       if (playerCardValue > aiCardValue) {
+        setPlayerScore((prev) => prev + 1);
         alert("Spieler gewinnt diese Runde!");
       } else if (playerCardValue < aiCardValue) {
+        setAiScore((prev) => prev + 1);
         alert("AI gewinnt diese Runde!");
       } else {
         alert("Unentschieden!");
       }
     }, 1500 * aiCards.length); // Warte, bis alle Karten gespielt wurden
+    setRoundEvaluated(true);
   };
 
   // Funktion zum Starten der nächsten Runde
@@ -135,6 +150,51 @@ const GamePage = () => {
 
     setCurrentRound(currentRound + 1); // Nächste Runde
     setRoundsLeft(roundsLeft - 1); // Verbleibende Runden reduzieren
+    setRoundEvaluated(false);
+  };
+
+  const evaluateHand = (hand) => {
+    const valuesCount = {};
+    const suitsCount = {};
+
+    hand.forEach((card) => {
+      valuesCount[card.value] = (valuesCount[card.value] || 0) + 1;
+      suitsCount[card.suit] = (suitsCount[card.suit] || 0) + 1;
+    });
+
+    // Überprüfe, ob ein Paar, Drilling oder Vierling vorhanden ist
+    const valueCounts = Object.values(valuesCount);
+    const isPair = valueCounts.includes(2);
+    const isTwoPair = valueCounts.filter((count) => count === 2).length === 2;
+    const isThreeOfAKind = valueCounts.includes(3);
+    const isFourOfAKind = valueCounts.includes(4);
+
+    // Überprüfe auf Flush (gleiche Farbe)
+    const isFlush = Object.values(suitsCount).includes(5);
+
+    // Überprüfe auf Straight (folgende Reihenfolge der Werte)
+    const sortedValues = hand
+      .map((card) => values.indexOf(card.value))
+      .sort((a, b) => a - b);
+    const isStraight =
+      sortedValues[4] - sortedValues[0] === 4 &&
+      new Set(sortedValues).size === 5;
+
+    // Berechne die Handkategorie
+    if (isFlush && isStraight) return "Straight Flush";
+    if (isFourOfAKind) return "Four of a Kind";
+    if (isFullHouse(valueCounts)) return "Full House";
+    if (isFlush) return "Flush";
+    if (isStraight) return "Straight";
+    if (isThreeOfAKind) return "Three of a Kind";
+    if (isTwoPair) return "Two Pair";
+    if (isPair) return "Pair";
+    return "High Card";
+  };
+
+  // Überprüfe, ob die Hand ein Full House ist
+  const isFullHouse = (valueCounts) => {
+    return valueCounts.includes(3) && valueCounts.includes(2);
   };
 
   return (
@@ -144,6 +204,8 @@ const GamePage = () => {
       </button>
       <h3 className="border p-2 m-2">Runde: {currentRound}</h3>
       <h3 className="border p-2 m-2">Verbleibende Runden: {roundsLeft}</h3>
+      <h3 className="border p-2 m-2">Spieler: {playerScore} Punkte</h3>
+      <h3 className="border p-2 m-2">AI: {aiScore} Punkte</h3>
 
       <h3 className="border p-2 m-2">Deine Hand:</h3>
       <ul className="flex gap-4 border p-2 m-2">
@@ -171,6 +233,10 @@ const GamePage = () => {
       <h3 className="border p-2 m-2">Gespielte Karten:</h3>
       <div className="flex gap-8 border p-2 m-2">
         <div>
+          <h3 className="border p-2 m-2">
+            Deine Handbewertung: {playerHandStrength}
+          </h3>
+
           <h4 className="border p-2 m-2">Spieler:</h4>
           {playerPlayedCards.map((card, index) => (
             <div key={index} className="border p-2 m-1">
@@ -189,16 +255,11 @@ const GamePage = () => {
       </div>
 
       {/* Button zum nächsten Runde starten */}
-      {playerPlayedCards.length > 0 && (
-        <div className="border p-2 m-2">
-          <button className="border p-2 m-2" onClick={evaluateRound}>
-            Runde auswerten
-          </button>
-          <button className="border p-2 m-2" onClick={nextRound}>
-            Nächste Runde
-          </button>
-        </div>
+      {playerPlayedCards.length > 0 && !roundEvaluated && (
+        <button onClick={evaluateRound}>Runde auswerten</button>
       )}
+
+      {roundEvaluated && <button onClick={nextRound}>Nächste Runde</button>}
     </div>
   );
 };
