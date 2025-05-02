@@ -68,6 +68,24 @@ const GamePage = () => {
     setAiDeck(aiDeck.slice(neededCards));
   };
 
+  const rankHand = (handStrength) => {
+    const ranks = {
+      // Definiert ein Objekt namens 'ranks'.
+      "High Card": 0, // Schlüssel "High Card" hat den Wert 0.
+      Pair: 1, // Schlüssel "Pair" hat den Wert 1.
+      "Two Pair": 2,
+      "Three of a Kind": 3,
+      Straight: 4,
+      Flush: 5,
+      "Full House": 6,
+      "Four of a Kind": 7,
+      "Straight Flush": 8,
+      "Royal Flush": 9,
+    };
+    return ranks[handStrength] || -1; // Gibt den Wert zurück, der zum Schlüssel 'handStrength' in 'ranks' gehört.
+    // Wenn 'handStrength' kein Schlüssel in 'ranks' ist, wird -1 zurückgegeben.
+  };
+
   // Initialer Spielablauf: Beide Spieler erhalten 7 Karten
   const startGame = () => {
     if (currentRound === 0) {
@@ -96,45 +114,53 @@ const GamePage = () => {
     setPlayerHandStrength(handStrength); // Setze die Handbewertung
   };
 
-  // Funktion zum Karten spielen (AI)
-  // const playAiCard = () => {
-  //   const randomCard = aiHand[Math.floor(Math.random() * aiHand.length)];
-  //   const newAiHand = aiHand.filter((c) => c !== randomCard);
-  //   setAiHand(newAiHand);
-  //   setAiPlayedCards([...aiPlayedCards, randomCard]);
-  // };
+  const determineBestAiHand = (aiHand) => {
+    const allCombinations = get5CardCombos(aiHand);
+    let bestHand = null;
+    let bestRank = -1;
 
-  // Funktion zum Auswerten der Runde (vorerst Zufall)
+    for (const hand of allCombinations) {
+      const handStrength = evaluateHand(hand);
+      const rank = rankHand(handStrength);
+
+      if (rank > bestRank) {
+        bestRank = rank;
+        bestHand = hand;
+      }
+    }
+    return bestHand;
+  };
+
   const evaluateRound = () => {
-    // AI spielt 5 zufällige Karten
-    const aiCards = [...aiHand].sort(() => 0.5 - Math.random()).slice(0, 5);
-    const newAiHand = aiHand.filter((c) => !aiCards.includes(c));
+    // AI wählt die beste Hand
+    const bestAiHandToPlay = determineBestAiHand(aiHand);
+    setAiPlayedCards(bestAiHandToPlay);
+
+    // Entferne die gespielten Karten aus der AI-Hand
+    const newAiHand = aiHand.filter((card) => !bestAiHandToPlay.includes(card));
     setAiHand(newAiHand);
 
-    // Karten nacheinander anzeigen
-    let aiCardsPlayed = [];
-    aiCards.forEach((card, index) => {
-      setTimeout(() => {
-        aiCardsPlayed.push(card);
-        setAiPlayedCards([...aiCardsPlayed]); // Karten nach und nach anzeigen
-      }, 1000 * (index + 1)); // Verzögerung für jede Karte
-    });
+    // Zeige die gespielten Karten der AI (jetzt alle auf einmal)
+    setAiPlayedCards(bestAiHandToPlay);
 
-    // Auswertung nach einer Verzögerung (nachdem alle Karten gespielt wurden)
+    // Auswertung der Runde (Vergleich der Handstärken)
     setTimeout(() => {
-      const playerCardValue = values.indexOf(playerPlayedCards[0]?.value);
-      const aiCardValue = values.indexOf(aiCards[0]?.value);
+      const playerHandStrength = evaluateHand(playerPlayedCards);
+      const aiHandStrength = evaluateHand(bestAiHandToPlay);
 
-      if (playerCardValue > aiCardValue) {
+      const playerRank = rankHand(playerHandStrength);
+      const aiRank = rankHand(aiHandStrength);
+
+      if (playerRank > aiRank) {
         setPlayerScore((prev) => prev + 1);
-        alert("Spieler gewinnt diese Runde!");
-      } else if (playerCardValue < aiCardValue) {
+        alert(`Spieler gewinnt die Runde mit: ${playerHandStrength}`);
+      } else if (playerRank < aiRank) {
         setAiScore((prev) => prev + 1);
-        alert("AI gewinnt diese Runde!");
+        alert(`AI gewinnt die Runde mit: ${aiHandStrength}`);
       } else {
-        alert("Unentschieden!");
+        alert(`Unentschieden! Beide hatten: ${playerHandStrength}`);
       }
-    }, 1500 * aiCards.length); // Warte, bis alle Karten gespielt wurden
+    }, 500);
     setRoundEvaluated(true);
   };
 
@@ -180,10 +206,14 @@ const GamePage = () => {
       sortedValues[4] - sortedValues[0] === 4 &&
       new Set(sortedValues).size === 5;
 
+    // überprüfe auf FullHouse
+    const isFullHouse = valueCounts.includes(3) && valueCounts.includes(2);
+
     // Berechne die Handkategorie
     if (isFlush && isStraight) return "Straight Flush";
     if (isFourOfAKind) return "Four of a Kind";
-    if (isFullHouse(valueCounts)) return "Full House";
+    // if (isFullHouse(valueCounts)) return "Full House";
+    if (isFullHouse) return "Full House";
     if (isFlush) return "Flush";
     if (isStraight) return "Straight";
     if (isThreeOfAKind) return "Three of a Kind";
@@ -192,9 +222,20 @@ const GamePage = () => {
     return "High Card";
   };
 
-  // Überprüfe, ob die Hand ein Full House ist
-  const isFullHouse = (valueCounts) => {
-    return valueCounts.includes(3) && valueCounts.includes(2);
+  const get5CardCombos = (cards) => {
+    const combos = [];
+    for (let i = 0; i < cards.length - 4; i++) {
+      for (let j = i + 1; j < cards.length - 3; j++) {
+        for (let k = j + 1; k < cards.length - 2; k++) {
+          for (let l = k + 1; l < cards.length - 1; l++) {
+            for (let m = l + 1; m < cards.length; m++) {
+              combos.push([cards[i], cards[j], cards[k], cards[l], cards[m]]);
+            }
+          }
+        }
+      }
+    }
+    return combos;
   };
 
   return (
@@ -255,7 +296,7 @@ const GamePage = () => {
       </div>
 
       {/* Button zum nächsten Runde starten */}
-      {playerPlayedCards.length > 0 && !roundEvaluated && (
+      {playerPlayedCards.length === 5 && !roundEvaluated && (
         <button onClick={evaluateRound}>Runde auswerten</button>
       )}
 
