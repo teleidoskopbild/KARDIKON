@@ -82,7 +82,7 @@ const GamePage = () => {
       "Straight Flush": 8,
       "Royal Flush": 9,
     };
-    return ranks[handStrength] || -1; // Gibt den Wert zurück, der zum Schlüssel 'handStrength' in 'ranks' gehört.
+    return ranks[handStrength]; // Gibt den Wert zurück, der zum Schlüssel 'handStrength' in 'ranks' gehört.
     // Wenn 'handStrength' kein Schlüssel in 'ranks' ist, wird -1 zurückgegeben.
   };
 
