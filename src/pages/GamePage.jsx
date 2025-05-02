@@ -43,7 +43,7 @@ const GamePage = () => {
   const [aiDeck, setAiDeck] = useState(shuffleDeck(createDeck())); // Deck für die AI
   const [playerHand, setPlayerHand] = useState([]); // Hand des Spielers
   const [aiHand, setAiHand] = useState([]); // Hand der AI
-  const [roundsLeft, setRoundsLeft] = useState(5); // Anzahl der Runden
+  const [roundsLeft, setRoundsLeft] = useState(7); // Anzahl der Runden
   const [currentRound, setCurrentRound] = useState(0); // Aktuelle Runde
   const [playerPlayedCards, setPlayerPlayedCards] = useState([]); // Karten, die der Spieler gelegt hat
   const [aiPlayedCards, setAiPlayedCards] = useState([]); // Karten, die die AI gelegt hat
@@ -256,7 +256,11 @@ const GamePage = () => {
             className="border p-2 cursor-pointer"
             onClick={() => playPlayerCard(card)} // Spieler kann Karte spielen
           >
-            {card.value} of {card.suit}
+            <img
+              className="w-[100px]"
+              src={`images/${card.value}_${card.suit}.svg`}
+              alt={`${card.value} of ${card.suit}`}
+            />
           </li>
         ))}
       </ul>
@@ -265,7 +269,11 @@ const GamePage = () => {
       <ul className="flex gap-4 border p-2 m-2">
         {aiHand.map((card, index) => (
           <li key={index} className="border p-2">
-            {card.value} of {card.suit}
+            <img
+              className="w-[100px]"
+              src={`images/${card.value}_${card.suit}.svg`}
+              alt={`${card.value} of ${card.suit}`}
+            />
           </li>
         ))}
       </ul>
@@ -281,7 +289,11 @@ const GamePage = () => {
           <h4 className="border p-2 m-2">Spieler:</h4>
           {playerPlayedCards.map((card, index) => (
             <div key={index} className="border p-2 m-1">
-              {card.value} of {card.suit}
+              <img
+                className="w-[100px]"
+                src={`images/${card.value}_${card.suit}.svg`}
+                alt={`${card.value} of ${card.suit}`}
+              />
             </div>
           ))}
         </div>
@@ -289,7 +301,11 @@ const GamePage = () => {
           <h4 className="border p-2 m-2">AI:</h4>
           {aiPlayedCards.map((card, index) => (
             <div key={index} className="border p-2 m-1">
-              {card.value} of {card.suit}
+              <img
+                className="w-[100px]"
+                src={`images/${card.value}_${card.suit}.svg`}
+                alt={`${card.value} of ${card.suit}`}
+              />
             </div>
           ))}
         </div>
