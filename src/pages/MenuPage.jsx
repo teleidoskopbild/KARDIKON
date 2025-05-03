@@ -7,19 +7,19 @@ export default function MenuPage() {
       <div className="flex flex-col space-y-4">
         <Link
           to="/game"
-          className="bg-white text-black font-semibold rounded-full px-8 py-3 hover:bg-red-300 transition duration-300 ease-in-out text-center"
+          className="bg-white text-black font-semibold rounded-full px-8 py-3 hover:bg-red-500 hover:text-white transition duration-300 ease-in-out text-center"
         >
           PLAY
         </Link>
         <Link
           to="/achievements"
-          className="bg-white text-black font-semibold rounded-full px-8 py-3 hover:bg-red-300 transition duration-300 ease-in-out text-center"
+          className="bg-white text-black font-semibold rounded-full px-8 py-3 hover:bg-red-500 hover:text-white  transition duration-300 ease-in-out text-center"
         >
           ACHIEVEMENTS
         </Link>
         <Link
-          to="/settings"
-          className="bg-white text-black font-semibold rounded-full px-8 py-3 hover:bg-red-300 transition duration-300 ease-in-out text-center"
+          to="/how-to-play"
+          className="bg-white text-black font-semibold rounded-full px-8 py-3 hover:bg-red-500 hover:text-white  transition duration-300 ease-in-out text-center"
         >
           HOW TO PLAY
         </Link>
