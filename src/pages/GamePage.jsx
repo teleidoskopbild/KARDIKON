@@ -239,7 +239,7 @@ const GamePage = () => {
   };
 
   return (
-    <div className="game-page">
+    <div className="game-page bg-black text-white min-h-screen">
       <button className="border p-2 m-4" onClick={startGame}>
         Spiel Starten
       </button>
@@ -248,14 +248,10 @@ const GamePage = () => {
       <h3 className="border p-2 m-2">Spieler: {playerScore} Punkte</h3>
       <h3 className="border p-2 m-2">AI: {aiScore} Punkte</h3>
 
-      <h3 className="border p-2 m-2">Deine Hand:</h3>
-      <ul className="flex gap-4 border p-2 m-2">
-        {playerHand.map((card, index) => (
-          <li
-            key={index}
-            className="border p-2 cursor-pointer"
-            onClick={() => playPlayerCard(card)} // Spieler kann Karte spielen
-          >
+      <h3 className="border p-2 m-2">AI Hand:</h3>
+      <ul className="flex  border p-2 m-2 justify-center">
+        {aiHand.map((card, index) => (
+          <li key={index} className=" p-0">
             <img
               className="w-[100px]"
               src={`images/${card.value}_${card.suit}.svg`}
@@ -265,10 +261,14 @@ const GamePage = () => {
         ))}
       </ul>
 
-      <h3 className="border p-2 m-2">AI Hand:</h3>
-      <ul className="flex gap-4 border p-2 m-2">
-        {aiHand.map((card, index) => (
-          <li key={index} className="border p-2">
+      <h3 className="border p-2 m-2">Deine Hand:</h3>
+      <ul className="flex  border p-2 m-2 justify-center">
+        {playerHand.map((card, index) => (
+          <li
+            key={index}
+            className=" p-0 cursor-pointer"
+            onClick={() => playPlayerCard(card)} // Spieler kann Karte spielen
+          >
             <img
               className="w-[100px]"
               src={`images/${card.value}_${card.suit}.svg`}
@@ -287,27 +287,32 @@ const GamePage = () => {
           </h3>
 
           <h4 className="border p-2 m-2">Spieler:</h4>
-          {playerPlayedCards.map((card, index) => (
-            <div key={index} className="border p-2 m-1">
-              <img
-                className="w-[100px]"
-                src={`images/${card.value}_${card.suit}.svg`}
-                alt={`${card.value} of ${card.suit}`}
-              />
-            </div>
-          ))}
+          <div className="flex">
+            {playerPlayedCards.map((card, index) => (
+              <div key={index} className=" p-0 m-1">
+                <img
+                  className="w-[100px]"
+                  src={`images/${card.value}_${card.suit}.svg`}
+                  alt={`${card.value} of ${card.suit}`}
+                />
+              </div>
+            ))}
+          </div>
         </div>
         <div>
+          <h3 className="border p-2 m-2">AI</h3>
           <h4 className="border p-2 m-2">AI:</h4>
-          {aiPlayedCards.map((card, index) => (
-            <div key={index} className="border p-2 m-1">
-              <img
-                className="w-[100px]"
-                src={`images/${card.value}_${card.suit}.svg`}
-                alt={`${card.value} of ${card.suit}`}
-              />
-            </div>
-          ))}
+          <div className="flex">
+            {aiPlayedCards.map((card, index) => (
+              <div key={index} className=" p-0 m-1">
+                <img
+                  className="w-[100px]"
+                  src={`images/${card.value}_${card.suit}.svg`}
+                  alt={`${card.value} of ${card.suit}`}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
