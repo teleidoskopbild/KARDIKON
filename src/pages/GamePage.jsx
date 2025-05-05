@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 // Erstelle das Deck
 const suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
@@ -41,16 +42,19 @@ const shuffleDeck = (deck) => {
 const GamePage = () => {
   const [deck, setDeck] = useState(shuffleDeck(createDeck())); // Deck für den Spieler
   const [aiDeck, setAiDeck] = useState(shuffleDeck(createDeck())); // Deck für die AI
-  const [playerHand, setPlayerHand] = useState([]); // Hand des Spielers
-  const [aiHand, setAiHand] = useState([]); // Hand der AI
-  const [roundsLeft, setRoundsLeft] = useState(7); // Anzahl der Runden
-  const [currentRound, setCurrentRound] = useState(0); // Aktuelle Runde
-  const [playerPlayedCards, setPlayerPlayedCards] = useState([]); // Karten, die der Spieler gelegt hat
-  const [aiPlayedCards, setAiPlayedCards] = useState([]); // Karten, die die AI gelegt hat
+  const [playerHand, setPlayerHand] = useState([]);
+  const [aiHand, setAiHand] = useState([]);
+  const [roundsLeft, setRoundsLeft] = useState(10);
+  const [currentRound, setCurrentRound] = useState(0);
+  const [playerPlayedCards, setPlayerPlayedCards] = useState([]);
+  const [aiPlayedCards, setAiPlayedCards] = useState([]);
   const [roundEvaluated, setRoundEvaluated] = useState(false);
   const [playerScore, setPlayerScore] = useState(0);
   const [aiScore, setAiScore] = useState(0);
   const [playerHandStrength, setPlayerHandStrength] = useState(""); // Zum Speichern der Handbewertung
+  const [gameStarted, setGameStarted] = useState(false);
+  const [roundResult, setRoundResult] = useState(null);
+  const [gameOver, setGameOver] = useState(false);
 
   // Funktion zum Ziehen von 7 Karten für den Spieler
   const drawPlayerCards = () => {
@@ -94,6 +98,11 @@ const GamePage = () => {
       setCurrentRound(currentRound + 1);
       setRoundsLeft(roundsLeft - 1);
     }
+  };
+
+  const startGameHandler = () => {
+    startGame(); // Rufe deine bestehende startGame-Funktion auf
+    setGameStarted(true);
   };
 
   // Funktion zum Karten spielen (Spieler)
@@ -147,21 +156,28 @@ const GamePage = () => {
     setTimeout(() => {
       const playerHandStrength = evaluateHand(playerPlayedCards);
       const aiHandStrength = evaluateHand(bestAiHandToPlay);
+      let resultMessage = "";
 
       const playerRank = rankHand(playerHandStrength);
       const aiRank = rankHand(aiHandStrength);
 
       if (playerRank > aiRank) {
         setPlayerScore((prev) => prev + 1);
-        alert(`Spieler gewinnt die Runde mit: ${playerHandStrength}`);
+        resultMessage = `You win the round with a: ${playerHandStrength}!`;
       } else if (playerRank < aiRank) {
         setAiScore((prev) => prev + 1);
-        alert(`AI gewinnt die Runde mit: ${aiHandStrength}`);
+        resultMessage = `The AI wins the round with a: ${aiHandStrength}!`;
       } else {
-        alert(`Unentschieden! Beide hatten: ${playerHandStrength}`);
+        resultMessage = `Draw! Both players have a: ${playerHandStrength}.`;
+      }
+
+      setRoundResult(resultMessage); // Setze die Runden-Nachricht
+      setRoundEvaluated(true);
+      if (currentRound === 10) {
+        // Da currentRound bei 0 startet und wir 10 Runden spielen
+        setGameOver(true);
       }
     }, 500);
-    setRoundEvaluated(true);
   };
 
   // Funktion zum Starten der nächsten Runde
@@ -177,6 +193,7 @@ const GamePage = () => {
     setCurrentRound(currentRound + 1); // Nächste Runde
     setRoundsLeft(roundsLeft - 1); // Verbleibende Runden reduzieren
     setRoundEvaluated(false);
+    setRoundResult(null); // Leere die Runden-Nachricht für die nächste Runde
   };
 
   const evaluateHand = (hand) => {
@@ -238,90 +255,132 @@ const GamePage = () => {
     return combos;
   };
 
+  const determineGameWinner = () => {
+    if (playerScore > aiScore) {
+      return "You have won the game!";
+    } else if (aiScore > playerScore) {
+      return "The Ai has won the game!";
+    } else {
+      return "Draw!";
+    }
+  };
+
   return (
-    <div className="game-page bg-black text-white min-h-screen">
-      <button className="border p-2 m-4" onClick={startGame}>
-        Spiel Starten
-      </button>
-      <h3 className="border p-2 m-2">Runde: {currentRound}</h3>
-      <h3 className="border p-2 m-2">Verbleibende Runden: {roundsLeft}</h3>
-      <h3 className="border p-2 m-2">Spieler: {playerScore} Punkte</h3>
-      <h3 className="border p-2 m-2">AI: {aiScore} Punkte</h3>
-
-      <h3 className="border p-2 m-2">AI Hand:</h3>
-      <ul className="flex  border p-2 m-2 justify-center">
-        {aiHand.map((card, index) => (
-          <li key={index} className=" p-0">
-            <img
-              className="w-[100px]"
-              src={`images/${card.value}_${card.suit}.svg`}
-              alt={`${card.value} of ${card.suit}`}
-            />
-          </li>
-        ))}
-      </ul>
-
-      <h3 className="border p-2 m-2">Deine Hand:</h3>
-      <ul className="flex  border p-2 m-2 justify-center">
-        {playerHand.map((card, index) => (
-          <li
-            key={index}
-            className=" p-0 cursor-pointer"
-            onClick={() => playPlayerCard(card)} // Spieler kann Karte spielen
-          >
-            <img
-              className="w-[100px]"
-              src={`images/${card.value}_${card.suit}.svg`}
-              alt={`${card.value} of ${card.suit}`}
-            />
-          </li>
-        ))}
-      </ul>
-
-      {/* Anzeige für die gespielten Karten */}
-      <h3 className="border p-2 m-2">Gespielte Karten:</h3>
-      <div className="flex gap-8 border p-2 m-2">
-        <div>
-          <h3 className="border p-2 m-2">
-            Deine Handbewertung: {playerHandStrength}
-          </h3>
-
-          <h4 className="border p-2 m-2">Spieler:</h4>
-          <div className="flex">
-            {playerPlayedCards.map((card, index) => (
-              <div key={index} className=" p-0 m-1">
-                <img
-                  className="w-[100px]"
-                  src={`images/${card.value}_${card.suit}.svg`}
-                  alt={`${card.value} of ${card.suit}`}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-        <div>
-          <h3 className="border p-2 m-2">AI</h3>
-          <h4 className="border p-2 m-2">AI:</h4>
-          <div className="flex">
-            {aiPlayedCards.map((card, index) => (
-              <div key={index} className=" p-0 m-1">
-                <img
-                  className="w-[100px]"
-                  src={`images/${card.value}_${card.suit}.svg`}
-                  alt={`${card.value} of ${card.suit}`}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Button zum nächsten Runde starten */}
-      {playerPlayedCards.length === 5 && !roundEvaluated && (
-        <button onClick={evaluateRound}>Runde auswerten</button>
+    <div className="game-page bg-black text-white h-screen flex flex-col justify-center">
+      {!gameStarted && (
+        <button
+          className="border p-4 m-6 rounded-full self-center"
+          onClick={startGameHandler}
+        >
+          Start Game
+        </button>
       )}
+      {gameStarted && (
+        <div className="min-w-screen min-h-screen">
+          {" "}
+          <h3 className="border p-2 m-2">Runde: {currentRound}</h3>
+          <h3 className="border p-2 m-2">Verbleibende Runden: {roundsLeft}</h3>
+          <h3 className="border p-2 m-2">Spieler: {playerScore} Punkte</h3>
+          <h3 className="border p-2 m-2">AI: {aiScore} Punkte</h3>
+          <h3 className="border p-2 m-2">AI Hand:</h3>
+          <ul className="flex  border p-2 m-2 justify-center">
+            {aiHand.map((card, index) => (
+              <li key={index} className=" p-0">
+                <img
+                  className="w-[100px]"
+                  src={`images/${card.value}_${card.suit}.svg`}
+                  alt={`${card.value} of ${card.suit}`}
+                />
+              </li>
+            ))}
+          </ul>
+          <h3 className="border p-2 m-2">Deine Hand:</h3>
+          <ul className="flex  border p-2 m-2 justify-center">
+            {playerHand.map((card, index) => (
+              <li
+                key={index}
+                className=" p-0 cursor-pointer"
+                onClick={() => playPlayerCard(card)} // Spieler kann Karte spielen
+              >
+                <img
+                  className="w-[100px]"
+                  src={`images/${card.value}_${card.suit}.svg`}
+                  alt={`${card.value} of ${card.suit}`}
+                />
+              </li>
+            ))}
+          </ul>
+          {/* Anzeige für die gespielten Karten */}
+          <h3 className="border p-2 m-2">Gespielte Karten:</h3>
+          <div className="flex gap-8 border p-2 m-2">
+            <div>
+              <h3 className="border p-2 m-2">
+                Deine Handbewertung: {playerHandStrength}
+              </h3>
 
-      {roundEvaluated && <button onClick={nextRound}>Nächste Runde</button>}
+              <h4 className="border p-2 m-2">Spieler:</h4>
+              <div className="flex">
+                {playerPlayedCards.map((card, index) => (
+                  <div key={index} className=" p-0 m-1">
+                    <img
+                      className="w-[100px]"
+                      src={`images/${card.value}_${card.suit}.svg`}
+                      alt={`${card.value} of ${card.suit}`}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 className="border p-2 m-2">AI</h3>
+              <h4 className="border p-2 m-2">AI:</h4>
+              <div className="flex">
+                {aiPlayedCards.map((card, index) => (
+                  <div key={index} className=" p-0 m-1">
+                    <img
+                      className="w-[100px]"
+                      src={`images/${card.value}_${card.suit}.svg`}
+                      alt={`${card.value} of ${card.suit}`}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          {/* Button zum nächsten Runde starten */}
+          {playerPlayedCards.length === 5 && !roundEvaluated && (
+            <button onClick={evaluateRound}>Runde auswerten</button>
+          )}
+          {roundEvaluated && <button onClick={nextRound}>Nächste Runde</button>}
+          {roundEvaluated && (
+            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border p-4 m-4 rounded bg-gray-800 z-50 flex flex-col items-center">
+              <p className="text-lg">{roundResult}</p>
+              {!gameOver && (
+                <button onClick={nextRound} className="border p-2 mt-2 rounded">
+                  Nächste Runde
+                </button>
+              )}
+              {gameOver && (
+                <div className="w-full h-[250px] fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border p-8 rounded bg-gray-800 text-center z-50">
+                  <h2 className="text-2xl font-bold mb-4">
+                    {determineGameWinner()}
+                  </h2>
+                  <p className="mb-4">You: {playerScore} Points</p>
+                  <p>AI: {aiScore} Points</p>
+                  <div className="mt-4">
+                    <Link
+                      to="/"
+                      className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-full mt-4 transition duration-300 ease-in-out"
+                    >
+                      Back to menu{" "}
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
