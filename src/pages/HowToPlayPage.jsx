@@ -14,7 +14,7 @@ export default function HowToPlayPage() {
         <div className="mb-8">
           <p className="text-xl font-semibold mb-2">Objective:</p>
           <p className="text-lg">
-            Achieve the highest score over 9 rounds of play.
+            Achieve the highest score over 10 rounds of play.
           </p>
         </div>
         <div className="mb-8">
@@ -45,8 +45,8 @@ export default function HowToPlayPage() {
         <div>
           <p className="text-xl font-semibold mb-4">Winning the Game:</p>
           <p className="text-lg mb-8">
-            After all 9 rounds have been played, the player with the most points
-            wins <span className="text-red-500">KARDIKON</span>!
+            After all 10 rounds have been played, the player with the most
+            points wins <span className="text-red-500">KARDIKON</span>!
           </p>
           <Link
             to="/"
