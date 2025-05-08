@@ -269,7 +269,7 @@ const GamePage = () => {
     <div className="game-page bg-black text-white h-screen flex flex-col justify-center">
       {!gameStarted && (
         <button
-          className="border p-4 m-6 rounded-full self-center"
+          className="border p-4 m-6 rounded-full self-center cursor-pointer hover:scale-105 transition"
           onClick={startGameHandler}
         >
           Start Game
@@ -278,12 +278,15 @@ const GamePage = () => {
       {gameStarted && (
         <div className="min-w-screen min-h-screen">
           {" "}
-          <h3 className="border p-2 m-2">Runde: {currentRound}</h3>
-          <h3 className="border p-2 m-2">Verbleibende Runden: {roundsLeft}</h3>
-          <h3 className="border p-2 m-2">Spieler: {playerScore} Punkte</h3>
-          <h3 className="border p-2 m-2">AI: {aiScore} Punkte</h3>
-          <h3 className="border p-2 m-2">AI Hand:</h3>
-          <ul className="flex  border p-2 m-2 justify-center">
+          <div className="flex justify-between">
+            <h3 className="p-2 m-2 text-3xl">Round: {currentRound}</h3>
+            <div className="flex mr-4">
+              <h3 className=" p-2 m-2">Player: {playerScore} Points</h3>
+              <h3 className=" p-2 m-2">AI: {aiScore} Points</h3>
+            </div>
+          </div>
+          <h3 className="p-2 m-2">AI Hand:</h3>
+          <ul className="flex   p-2 m-2 justify-center">
             {aiHand.map((card, index) => (
               <li key={index} className=" p-0">
                 <img
@@ -294,8 +297,30 @@ const GamePage = () => {
               </li>
             ))}
           </ul>
-          <h3 className="border p-2 m-2">Deine Hand:</h3>
-          <ul className="flex  border p-2 m-2 justify-center">
+          <div className="flex justify-center">
+            {aiPlayedCards.map((card, index) => (
+              <div key={index} className=" p-0 m-1">
+                <img
+                  className="w-[100px]"
+                  src={`images/${card.value}_${card.suit}.svg`}
+                  alt={`${card.value} of ${card.suit}`}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-center">
+            {playerPlayedCards.map((card, index) => (
+              <div key={index} className=" p-0 m-1">
+                <img
+                  className="w-[100px]"
+                  src={`images/${card.value}_${card.suit}.svg`}
+                  alt={`${card.value} of ${card.suit}`}
+                />
+              </div>
+            ))}
+          </div>
+          <h3 className="p-2 m-2">Your Hand:</h3>
+          <ul className="flex p-2 m-2 justify-center">
             {playerHand.map((card, index) => (
               <li
                 key={index}
@@ -303,7 +328,7 @@ const GamePage = () => {
                 onClick={() => playPlayerCard(card)} // Spieler kann Karte spielen
               >
                 <img
-                  className="w-[100px]"
+                  className="w-[125px]"
                   src={`images/${card.value}_${card.suit}.svg`}
                   alt={`${card.value} of ${card.suit}`}
                 />
@@ -311,47 +336,27 @@ const GamePage = () => {
             ))}
           </ul>
           {/* Anzeige für die gespielten Karten */}
-          <h3 className="border p-2 m-2">Gespielte Karten:</h3>
-          <div className="flex gap-8 border p-2 m-2">
+          {/* <div className="flex gap-8 border p-2 m-2">
             <div>
               <h3 className="border p-2 m-2">
                 Deine Handbewertung: {playerHandStrength}
               </h3>
 
               <h4 className="border p-2 m-2">Spieler:</h4>
-              <div className="flex">
-                {playerPlayedCards.map((card, index) => (
-                  <div key={index} className=" p-0 m-1">
-                    <img
-                      className="w-[100px]"
-                      src={`images/${card.value}_${card.suit}.svg`}
-                      alt={`${card.value} of ${card.suit}`}
-                    />
-                  </div>
-                ))}
-              </div>
             </div>
-            <div>
-              <h3 className="border p-2 m-2">AI</h3>
-              <h4 className="border p-2 m-2">AI:</h4>
-              <div className="flex">
-                {aiPlayedCards.map((card, index) => (
-                  <div key={index} className=" p-0 m-1">
-                    <img
-                      className="w-[100px]"
-                      src={`images/${card.value}_${card.suit}.svg`}
-                      alt={`${card.value} of ${card.suit}`}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          </div> */}
           {/* Button zum nächsten Runde starten */}
-          {playerPlayedCards.length === 5 && !roundEvaluated && (
-            <button onClick={evaluateRound}>Runde auswerten</button>
-          )}
-          {roundEvaluated && <button onClick={nextRound}>Nächste Runde</button>}
+          <div className="flex justify-center">
+            {" "}
+            {playerPlayedCards.length === 5 && !roundEvaluated && (
+              <button
+                className="text-2xl hover:scale-105 transition  cursor-pointer"
+                onClick={evaluateRound}
+              >
+                Play Hand
+              </button>
+            )}
+          </div>
           {roundEvaluated && (
             <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border p-4 m-4 rounded bg-gray-800 z-50 flex flex-col items-center">
               <p className="text-lg">{roundResult}</p>
