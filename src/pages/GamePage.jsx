@@ -137,6 +137,11 @@ const GamePage = () => {
         bestHand = hand;
       }
     }
+    bestHand.sort((a, b) => {
+      const valueA = values.indexOf(a.value);
+      const valueB = values.indexOf(b.value);
+      return valueA - valueB;
+    });
     return bestHand;
   };
 
@@ -291,7 +296,7 @@ const GamePage = () => {
               <li key={index} className=" p-0">
                 <img
                   className="w-[100px]"
-                  src={`images/${card.value}_${card.suit}.svg`}
+                  src={`images/Backside.svg`}
                   alt={`${card.value} of ${card.suit}`}
                 />
               </li>
