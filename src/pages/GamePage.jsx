@@ -270,6 +270,25 @@ const GamePage = () => {
     }
   };
 
+  const withdrawPlayerCard = (card) => {
+    // Überprüfe, ob die Karte in den gespielten Karten vorhanden ist
+    const cardIndex = playerPlayedCards.indexOf(card);
+    if (cardIndex === -1) {
+      return; // Karte nicht gefunden, tue nichts
+    }
+
+    // Erstelle neue Arrays für gespielte und aktuelle Hand
+    const newPlayerPlayedCards = [...playerPlayedCards];
+    const newPlayerHand = [...playerHand];
+
+    // Entferne die Karte aus den gespielten Karten und füge sie der Hand hinzu
+    newPlayerHand.push(newPlayerPlayedCards.splice(cardIndex, 1)[0]);
+
+    // Aktualisiere den State
+    setPlayerPlayedCards(newPlayerPlayedCards);
+    setPlayerHand(newPlayerHand);
+  };
+
   return (
     <div className="game-page bg-black text-white h-screen flex flex-col justify-center">
       {!gameStarted && (
@@ -315,7 +334,11 @@ const GamePage = () => {
           </div>
           <div className="flex justify-center">
             {playerPlayedCards.map((card, index) => (
-              <div key={index} className=" p-0 m-1">
+              <div
+                key={index}
+                className="p-0 m-1 cursor-pointer" // cursor-pointer für besseres UX
+                onClick={() => withdrawPlayerCard(card)} // Funktion hier aufrufen
+              >
                 <img
                   className="w-[100px]"
                   src={`images/${card.value}_${card.suit}.svg`}
