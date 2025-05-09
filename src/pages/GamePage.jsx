@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import "./gamepage.css";
 
 // Erstelle das Deck
 const suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
@@ -309,7 +310,7 @@ const GamePage = () => {
               <h3 className=" p-2 m-2">AI: {aiScore} Points</h3>
             </div>
           </div>
-          <h3 className="p-2 m-2">AI Hand:</h3>
+          <h3 className="p-2 m-2 text-center">AI Hand:</h3>
           <ul className="flex   p-2 m-2 justify-center">
             {aiHand.map((card, index) => (
               <li key={index} className=" p-0">
@@ -321,7 +322,7 @@ const GamePage = () => {
               </li>
             ))}
           </ul>
-          <div className="flex justify-center">
+          <div className="flex justify-center h-[150px]">
             {aiPlayedCards.map((card, index) => (
               <div key={index} className=" p-0 m-1">
                 <img
@@ -332,11 +333,12 @@ const GamePage = () => {
               </div>
             ))}
           </div>
-          <div className="flex justify-center">
+          {/* gespielte Karten */}
+          <div className="flex justify-center h-[150px]">
             {playerPlayedCards.map((card, index) => (
               <div
                 key={index}
-                className="p-0 m-1 cursor-pointer" // cursor-pointer für besseres UX
+                className="p-0 m-1 cursor-pointer hover:animate-pulse" // cursor-pointer für besseres UX
                 onClick={() => withdrawPlayerCard(card)} // Funktion hier aufrufen
               >
                 <img
@@ -347,12 +349,12 @@ const GamePage = () => {
               </div>
             ))}
           </div>
-          <h3 className="p-2 m-2">Your Hand:</h3>
+          <h3 className="p-2 m-2 text-center">Your Hand:</h3>
           <ul className="flex p-2 m-2 justify-center">
             {playerHand.map((card, index) => (
               <li
                 key={index}
-                className=" p-0 cursor-pointer"
+                className=" p-0 cursor-pointer transform hover:translate-x-3 hover:rotate-1 transition duration-200 ease-in-out"
                 onClick={() => playPlayerCard(card)} // Spieler kann Karte spielen
               >
                 <img
@@ -363,38 +365,32 @@ const GamePage = () => {
               </li>
             ))}
           </ul>
-          {/* Anzeige für die gespielten Karten */}
-          {/* <div className="flex gap-8 border p-2 m-2">
-            <div>
-              <h3 className="border p-2 m-2">
-                Deine Handbewertung: {playerHandStrength}
-              </h3>
-
-              <h4 className="border p-2 m-2">Spieler:</h4>
-            </div>
-          </div> */}
-          {/* Button zum nächsten Runde starten */}
           <div className="flex justify-center">
-            {" "}
             {playerPlayedCards.length === 5 && !roundEvaluated && (
-              <button
-                className="text-2xl hover:scale-105 transition  cursor-pointer"
-                onClick={evaluateRound}
-              >
-                Play Hand
-              </button>
+              <div>
+                {" "}
+                <button
+                  className="font-bold uppercase border m-4 p-4 text-2xl hover:scale-105 transition  cursor-pointer"
+                  onClick={evaluateRound}
+                >
+                  Play Hand
+                </button>
+                <p className="text-center mt-4">
+                  You have a: {playerHandStrength}
+                </p>
+              </div>
             )}
           </div>
           {roundEvaluated && (
-            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border p-4 m-4 rounded bg-gray-800 z-50 flex flex-col items-center">
+            <div className="h-[125px] fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border p-4 m-4 rounded bg-gray-800 z-50 flex flex-col items-center">
               <p className="text-lg">{roundResult}</p>
               {!gameOver && (
-                <button onClick={nextRound} className="border p-2 mt-2 rounded">
-                  Nächste Runde
+                <button onClick={nextRound} className="border p-2 mt-6 rounded">
+                  Next Round
                 </button>
               )}
               {gameOver && (
-                <div className="w-full h-[250px] fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border p-8 rounded bg-gray-800 text-center z-50">
+                <div className="flex flex-col justify-between w-full h-[300px] fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border p-8 rounded bg-gray-800 text-center z-50">
                   <h2 className="text-2xl font-bold mb-4">
                     {determineGameWinner()}
                   </h2>
@@ -405,7 +401,7 @@ const GamePage = () => {
                       to="/"
                       className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-full mt-4 transition duration-300 ease-in-out"
                     >
-                      Back to menu{" "}
+                      Back to menu
                     </Link>
                   </div>
                 </div>
