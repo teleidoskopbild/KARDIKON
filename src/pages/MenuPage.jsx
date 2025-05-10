@@ -12,10 +12,10 @@ export default function MenuPage() {
           PLAY
         </Link>
         <Link
-          to="/achievements"
+          to="/stats"
           className="bg-white text-black font-semibold rounded-full px-8 py-3 hover:bg-red-500 hover:text-white  transition duration-300 ease-in-out text-center"
         >
-          ACHIEVEMENTS
+          STATS
         </Link>
         <Link
           to="/how-to-play"
