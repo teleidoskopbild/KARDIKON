@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./gamepage.css";
 
@@ -56,6 +56,29 @@ const GamePage = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const [roundResult, setRoundResult] = useState(null);
   const [gameOver, setGameOver] = useState(false);
+  const [stats, setStats] = useState(() => {
+    // zum Speichern der Stats
+    const saved = localStorage.getItem("gameStats");
+    return saved
+      ? JSON.parse(saved)
+      : {
+          gamesPlayed: 0,
+          gamesWon: 0,
+          gamesLost: 0,
+          gamesTied: 0,
+          handsPlayed: 0,
+          handsWon: 0,
+          handsLost: 0,
+          handsTied: 0,
+          handWins: {}, // z.B. { "Pair": 3 }
+          handLosses: {},
+          handTies: {},
+        };
+  });
+
+  useEffect(() => {
+    localStorage.setItem("gameStats", JSON.stringify(stats));
+  }, [stats]);
 
   // Funktion zum Ziehen von 7 Karten für den Spieler
   const drawPlayerCards = () => {
@@ -170,11 +193,46 @@ const GamePage = () => {
       if (playerRank > aiRank) {
         setPlayerScore((prev) => prev + 1);
         resultMessage = `You win the round with a: ${playerHandStrength}!`;
+
+        // Update Stats - Spieler gewinnt die Hand
+        setStats((prevStats) => ({
+          ...prevStats,
+          handsWon: prevStats.handsWon + 1,
+          handsPlayed: prevStats.handsPlayed + 1,
+          handWins: {
+            ...prevStats.handWins,
+            [playerHandStrength]:
+              (prevStats.handWins[playerHandStrength] || 0) + 1,
+          },
+        }));
       } else if (playerRank < aiRank) {
         setAiScore((prev) => prev + 1);
         resultMessage = `The AI wins the round with a: ${aiHandStrength}!`;
+
+        // Update Stats - AI gewinnt die Hand
+        setStats((prevStats) => ({
+          ...prevStats,
+          handsLost: prevStats.handsLost + 1,
+          handsPlayed: prevStats.handsPlayed + 1,
+          handLosses: {
+            ...prevStats.handLosses,
+            [aiHandStrength]: (prevStats.handLosses[aiHandStrength] || 0) + 1,
+          },
+        }));
       } else {
         resultMessage = `Draw! Both players have a: ${playerHandStrength}.`;
+
+        // Update Stats - Unentschieden bei der Hand
+        setStats((prevStats) => ({
+          ...prevStats,
+          handsTied: prevStats.handsTied + 1,
+          handsPlayed: prevStats.handsPlayed + 1,
+          handTies: {
+            ...prevStats.handTies,
+            [playerHandStrength]:
+              (prevStats.handTies[playerHandStrength] || 0) + 1,
+          },
+        }));
       }
 
       setRoundResult(resultMessage); // Setze die Runden-Nachricht
@@ -262,11 +320,28 @@ const GamePage = () => {
   };
 
   const determineGameWinner = () => {
+    console.log("playerScore:", playerScore, "aiScore:", aiScore); // Log für playerScore und aiScore
+    console.log("Previous Stats:", stats); // Log für die vorherigen stats
     if (playerScore > aiScore) {
+      // setStats((prevStats) => ({
+      //   ...prevStats,
+      //   gamesWon: prevStats.gamesWon + 1,
+      //   gamesPlayed: prevStats.gamesPlayed + 1,
+      // }));
       return "You have won the game!";
     } else if (aiScore > playerScore) {
+      // setStats((prevStats) => ({
+      //   ...prevStats,
+      //   gamesLost: prevStats.gamesLost + 1,
+      //   gamesPlayed: prevStats.gamesPlayed + 1,
+      // }));
       return "The Ai has won the game!";
     } else {
+      // setStats((prevStats) => ({
+      //   ...prevStats,
+      //   gamesTied: prevStats.gamesTied + 1,
+      //   gamesPlayed: prevStats.gamesPlayed + 1,
+      // }));
       return "Draw!";
     }
   };
