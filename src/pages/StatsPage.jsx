@@ -59,7 +59,7 @@ const StatsPage = () => {
       <p className="text-gray-300 text-sm">
         Here are the collected statistics from the game.
       </p>
-
+      {/* 
       <div className="space-y-1 border-t border-gray-700 pt-4">
         <h2 className="text-lg font-semibold">Game Statistics</h2>
         <div className="grid grid-cols-2 gap-y-1 text-sm">
@@ -68,50 +68,41 @@ const StatsPage = () => {
           <p>Games Lost: {stats.gamesLost}</p>
           <p>Games Tied: {stats.gamesTied}</p>
         </div>
-      </div>
+      </div> */}
 
-      <div className="space-y-4 border-t border-gray-700 pt-4">
-        <h2 className="text-lg font-semibold">Hand Statistics</h2>
-        <div className="grid grid-cols-2 gap-y-1 text-sm">
-          <p>Hands Played: {stats.handsPlayed}</p>
-          <p>Hands Won: {stats.handsWon}</p>
-          <p>Hands Lost: {stats.handsLost}</p>
-          <p>Hands Tied: {stats.handsTied}</p>
+      <div>
+        <h3 className="font-medium mb-1 text-sm mb-6">
+          Hand Outcomes by Category
+        </h3>
+        <div className="grid grid-cols-4 gap-y-1 text-sm font-semibold border-b border-gray-600 pb-2 mb-2">
+          <p>Total</p>
+          <p className="text-green-400">{stats.handsWon}</p>
+          <p className="text-red-400">{stats.handsLost}</p>
+          <p className="text-yellow-400">{stats.handsTied}</p>
         </div>
 
-        <div>
-          <h3 className="font-medium mb-1 text-sm">Hand Category Wins</h3>
-          <div className="grid grid-cols-2 gap-y-1 text-sm">
-            {allHandCategories.map((category) => (
-              <p key={category}>
-                {category}: {stats.handWins[category] || 0}
-              </p>
-            ))}
-          </div>
+        <div className="grid grid-cols-4 gap-y-1 text-sm font-semibold border-b border-gray-600 pb-2 mb-2">
+          <p>Hand</p>
+          <p className="text-green-400">Win</p>
+          <p className="text-red-400">Loss</p>
+          <p className="text-yellow-400">Draw</p>
         </div>
-
-        <div>
-          <h3 className="font-medium mb-1 text-sm">Hand Category Losses</h3>
-          <div className="grid grid-cols-2 gap-y-1 text-sm">
-            {allHandCategories.map((category) => (
-              <p key={category}>
-                {category}: {stats.handLosses[category] || 0}
-              </p>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <h3 className="font-medium mb-1 text-sm">Hand Category Ties</h3>
-          <div className="grid grid-cols-2 gap-y-1 text-sm">
-            {allHandCategories.map((category) => (
-              <p key={category}>
-                {category}: {stats.handTies[category] || 0}
-              </p>
-            ))}
-          </div>
+        <div className="grid grid-cols-4 gap-y-1 text-sm">
+          {allHandCategories.map((category) => [
+            <p key={`${category}-name`}>{category}</p>,
+            <p key={`${category}-win`} className="text-green-400">
+              {stats.handWins[category] || 0}
+            </p>,
+            <p key={`${category}-loss`} className="text-red-400">
+              {stats.handLosses[category] || 0}
+            </p>,
+            <p key={`${category}-draw`} className="text-yellow-400">
+              {stats.handTies[category] || 0}
+            </p>,
+          ])}
         </div>
       </div>
+
       <div>
         <Link
           to="/"
