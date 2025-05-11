@@ -366,7 +366,7 @@ const GamePage = () => {
   };
 
   return (
-    <div className="game-page bg-black text-white h-screen flex flex-col justify-center">
+    <div className="game-page bg-black text-white min-h-screen flex flex-col justify-center">
       {!gameStarted && (
         <button
           className="border p-4 m-6 rounded-full self-center cursor-pointer hover:scale-105 transition"
