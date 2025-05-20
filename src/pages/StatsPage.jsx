@@ -88,18 +88,27 @@ const StatsPage = () => {
           <p className="text-yellow-400">Draw</p>
         </div>
         <div className="grid grid-cols-4 gap-y-1 text-sm">
-          {allHandCategories.map((category) => [
-            <p key={`${category}-name`}>{category}</p>,
-            <p key={`${category}-win`} className="text-green-400">
-              {stats.handWins[category] || 0}
-            </p>,
-            <p key={`${category}-loss`} className="text-red-400">
-              {stats.handLosses[category] || 0}
-            </p>,
-            <p key={`${category}-draw`} className="text-yellow-400">
-              {stats.handTies[category] || 0}
-            </p>,
-          ])}
+          {allHandCategories.map((category) => {
+            const win = stats.handWins[category] || 0;
+            const loss = stats.handLosses[category] || 0;
+            const tie = stats.handTies[category] || 0;
+            const total = stats.handsPlayed || 1;
+
+            const percent = (n) => `${((n / total) * 100).toFixed(1)}%`;
+
+            return [
+              <p key={`${category}-name`}>{category}</p>,
+              <p key={`${category}-win`} className="text-green-400">
+                {win} ({percent(win)})
+              </p>,
+              <p key={`${category}-loss`} className="text-red-400">
+                {loss} ({percent(loss)})
+              </p>,
+              <p key={`${category}-draw`} className="text-yellow-400">
+                {tie} ({percent(tie)})
+              </p>,
+            ];
+          })}
         </div>
       </div>
 
